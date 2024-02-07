@@ -3,6 +3,7 @@ import pygame.font
 GRAYISH_WHITE = (242, 243, 245)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
+RED = (245, 10, 10)
 
 CONTINUE_RUNNING = True
 
@@ -13,26 +14,61 @@ INITIAL_WINDOW_HEIGHT = 600
 SCREEN = pygame.display.set_mode((INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT))
 pygame.display.set_caption("Initial settings")
 
+chosen_character = None
+
 
 def drawing_initial_window():
     SCREEN.fill(GRAYISH_WHITE)
-    resol_4k_rect = pygame.Rect(60, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
-    resol_hd_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - 160, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
 
+    red_character_button_rect = pygame.Rect(60, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
+    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - 160, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
+
+    #načtení postav
+    red_character = pygame.image.load("images/red_character.png")
+    blue_character = pygame.image.load("images/red_character.png")
+    #dočasně jsou jeden a ten samej obrázek
+
+    blitted_red_character = pygame.transform.scale(red_character, (200, 200))
+    blitted_blue_character = pygame.transform.scale(blue_character, (200, 200))
+
+    #nastavení textu
     menu_text = pygame.font.SysFont('Calibri', 30)
-    top_text = menu_text.render('Vyberte rozlišení, pro které', 1, BLACK)
-    top_text_2 = menu_text.render('bude hra uzpůsobena.', 1, BLACK)
+    top_text = menu_text.render('Vyberte si postavu, se kterou', 1, BLACK)
+    top_text_2 = menu_text.render('budete hrát tuto hru.', 1, BLACK)
 
-    SCREEN.blit(top_text, (INITIAL_WINDOW_WIDTH / 2 - top_text.get_width() / 2, INITIAL_WINDOW_HEIGHT - 202))
-    SCREEN.blit(top_text_2, (INITIAL_WINDOW_WIDTH / 2 - top_text_2.get_width() / 2, INITIAL_WINDOW_HEIGHT - 170))
+    #zobrazení textu na okně
+    SCREEN.blit(top_text, (INITIAL_WINDOW_WIDTH / 2 - top_text.get_width() / 2, 20))
+    SCREEN.blit(top_text_2, (INITIAL_WINDOW_WIDTH / 2 - top_text_2.get_width() / 2, 55))
 
-    pygame.draw.circle(SCREEN, BLUE, resol_4k_rect.center, 50)
-    pygame.draw.circle(SCREEN, BLUE, resol_hd_rect.center, 50)
+    #zobrazení tlačítek na okně
+    pygame.draw.circle(SCREEN, RED, red_character_button_rect.center, 50)
+    pygame.draw.circle(SCREEN, BLUE, blue_character_button_rect.center, 50)
+
+    #zobrazení postav na okně
+    SCREEN.blit(blitted_red_character, (red_character_button_rect.x - blitted_red_character.get_width() / 2, 185))
+    SCREEN.blit(blitted_blue_character, (blue_character_button_rect.x - blitted_blue_character.get_width() / 2, 185))
 
     pygame.display.update()
+    return red_character_button_rect, blue_character_button_rect
+
+
+#Create a pygame.event.MOUSEBUTTONDOWN event handler that checks if the mouse is clicked inside the button's boundaries
+def on_mouse_button_down(event):
+    global chosen_character
+
+    red_character_button_rect = pygame.Rect(60, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
+    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - 160, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
+
+    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and red_character_button_rect.collidepoint(event.pos):
+        chosen_character = "red"
+
+    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and blue_character_button_rect.collidepoint(event.pos):
+        chosen_character = "blue"
 
 
 def main():
+    global chosen_character
+
     initial_window_run = True
     continue_running_check = CONTINUE_RUNNING
 
@@ -48,15 +84,15 @@ def main():
         if keys[pygame.K_UP]:
             initial_window_run = False
 
+        # Check for the mouse button down event
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # Call the on_mouse_button_down() function
+            on_mouse_button_down(event)
+
     pygame.quit()
 
-    return continue_running_check
+    return continue_running_check, chosen_character
 
-chosen_size = "4k"
-if chosen_size == "4k":
-    size = "res_4k"
-else:
-    size = "res_fullhd"
 
 #TODO: zmáčknutelné tlačítko
 #TODO: vybírání postav

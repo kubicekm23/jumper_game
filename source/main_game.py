@@ -1,14 +1,18 @@
 import pygame
-pygame.init()
 
 
-def main(size):
-    if size == "res_4k":
-        WIDTH = 2500
+
+def main(chosen_character):
+    pygame.init()
+
+    #výběr velikosti okna
+    system_width = pygame.display.Info().current_w
+    if system_width > 2500:
+        WIDTH = 2520
         HEIGHT = 1200
 
-    elif size == "res_fullhd":
-        WIDTH = 1200
+    elif system_width > 1200:
+        WIDTH = 1500
         HEIGHT = 500
 
     else:
