@@ -1,3 +1,5 @@
+import pygame
+pygame.init()
 import pygame.font
 
 GRAYISH_WHITE = (242, 243, 245)
@@ -20,44 +22,51 @@ chosen_character = None
 def drawing_initial_window():
     SCREEN.fill(GRAYISH_WHITE)
 
-    red_character_button_rect = pygame.Rect(60, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
-    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - 160, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
+    button_distance_from_border = 60
 
-    #načtení postav
+    red_character_button_rect = pygame.Rect(button_distance_from_border, INITIAL_WINDOW_HEIGHT - 170, 100, 100)
+    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - button_distance_from_border - 100, red_character_button_rect.y, 100, 100)
+
+    # načtení postav
     red_character = pygame.image.load("images/red_character.png")
     blue_character = pygame.image.load("images/red_character.png")
-    #dočasně jsou jeden a ten samej obrázek
+    # TODO: přidat skin pro druhou postavu
 
     blitted_red_character = pygame.transform.scale(red_character, (200, 200))
     blitted_blue_character = pygame.transform.scale(blue_character, (200, 200))
 
-    #nastavení textu
+    # nastavení textu
     menu_text = pygame.font.SysFont('Calibri', 30)
     top_text = menu_text.render('Vyberte si postavu, se kterou', 1, BLACK)
     top_text_2 = menu_text.render('budete hrát tuto hru.', 1, BLACK)
 
-    #zobrazení textu na okně
+    # zobrazení textu na okně
     SCREEN.blit(top_text, (INITIAL_WINDOW_WIDTH / 2 - top_text.get_width() / 2, 20))
     SCREEN.blit(top_text_2, (INITIAL_WINDOW_WIDTH / 2 - top_text_2.get_width() / 2, 55))
 
-    #zobrazení tlačítek na okně
+    # zobrazení tlačítek na okně
     pygame.draw.circle(SCREEN, RED, red_character_button_rect.center, 50)
-    pygame.draw.circle(SCREEN, BLUE, blue_character_button_rect.center, 50)
+    pygame.draw.circle(SCREEN, BLUE, (INITIAL_WINDOW_WIDTH - button_distance_from_border - 50, red_character_button_rect.y + 50), 50)
 
-    #zobrazení postav na okně
-    SCREEN.blit(blitted_red_character, (red_character_button_rect.x - blitted_red_character.get_width() / 2, 185))
-    SCREEN.blit(blitted_blue_character, (blue_character_button_rect.x - blitted_blue_character.get_width() / 2, 185))
+    # zobrazení postav na okně
+    SCREEN.blit(blitted_red_character, (red_character_button_rect.x - blitted_red_character.get_width() / 2 + 60,
+                                        185))
+    SCREEN.blit(blitted_blue_character, (blue_character_button_rect.x - blitted_blue_character.get_width() / 2 + 60,
+                                         185))
 
     pygame.display.update()
     return red_character_button_rect, blue_character_button_rect
 
 
-#Create a pygame.event.MOUSEBUTTONDOWN event handler that checks if the mouse is clicked inside the button's boundaries
+# Create a pygame.event.MOUSEBUTTONDOWN event handler that checks if the mouse is clicked inside the button's boundaries
 def on_mouse_button_down(event):
     global chosen_character
 
-    red_character_button_rect = pygame.Rect(60, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
-    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - 160, INITIAL_WINDOW_HEIGHT - 120, 100, 100)
+    button_distance_from_border = 60
+
+    red_character_button_rect = pygame.Rect(button_distance_from_border, INITIAL_WINDOW_HEIGHT - 170, 100, 100)
+    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - button_distance_from_border - 100,
+                                             red_character_button_rect.y, 100, 100)
 
     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and red_character_button_rect.collidepoint(event.pos):
         chosen_character = "red"
@@ -86,13 +95,13 @@ def main():
 
         # Check for the mouse button down event
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            # Call the on_mouse_button_down() function
             on_mouse_button_down(event)
+            initial_window_run = False
 
     pygame.quit()
 
     return continue_running_check, chosen_character
 
-
-#TODO: zmáčknutelné tlačítko
-#TODO: vybírání postav
+# TODO: zmáčknutelné tlačítko
+# TODO: vybírání postav
+# TODO: hezké pozadí
