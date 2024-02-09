@@ -56,12 +56,97 @@ ground_tiles = math.ceil(WIDTH / mountain_image.get_width() + 30)
 ground_width = ground.get_width()
 ground_height = ground.get_height()
 
+# pozice hráče
+player_initial_position = (WIDTH / 2 - 27, HEIGHT - ground_height)
+player_height, player_width = 55, 50
+player_rect = pygame.Rect((player_initial_position[0], player_initial_position[1] - player_height, player_height, player_width))
 
-def draw(blittable_chosen_character):
+# pohybové rozmezí pro postavu
+zone_left = pygame.Rect((WIDTH / 2 - 80), 0, 5, HEIGHT)
+zone_right = pygame.Rect((WIDTH / 2 + 80), 0, 5, HEIGHT)
+
+# otočení postavy
+facing_left = False
+facing_right = False
+
+# sbíratelné hvězdičky
+collectible_star1 = pygame.image.load("images/star.png").convert_alpha()
+collectible_star2 = pygame.image.load("images/star.png").convert_alpha()
+collectible_star3 = pygame.image.load("images/star.png").convert_alpha()
+
+collected_star1 = False
+collected_star2 = False
+collected_star3 = False
+
+
+#hráč
+class Character:
+    def __init__(self, name, skin, health, health_max):
+        self.name = name
+        self.skin = skin
+        self.health = health
+        self.health_max = health_max
+        self.rect = pygame.Rect(WIDTH / 2, HEIGHT - ground_height - player_height, 50, 50)
+        self.velocity = 0
+        self.collected_star1 = False
+        self.collected_star2 = False
+        self.collected_star3 = False
+
+
+def movement():
+    global facing_left, facing_right, scroll, scroll_cloud, PLAYER_VEL
+
+    delta_time = clock.tick(FPS) / 25
+    keys = pygame.key.get_pressed()
+    touching_ground = False
+    touching_top = False
+
+    ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
+
+    #kontrola proti skákání ve vzduchu
+    if player_rect.colliderect(ground_collisions):
+        touching_ground = True
+    elif not player_rect.colliderect(ground_collisions):
+        touching_ground = False
+
+    #kontrola zda je hráč na zemi, pokud jo tak ho posune na tu zem
+    if player_rect.y > HEIGHT - ground_height:
+        player_rect.y = HEIGHT - ground_height - player_rect.height
+
+    #pohyb do leva
+    if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
+        zone_left):
+        scroll += PLAYER_VEL * delta_time
+        scroll_cloud += PLAYER_VEL * delta_time
+        for obstacle in obstacles:
+            obstacle.move(PLAYER_VEL * delta_time)
+    elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        player_rect.x -= 2
+        #otáčení hráče
+        if not facing_left:
+            facing_right = False
+            facing_left = True
+            player.skin = pygame.transform.flip(player.skin, True, False)
+
+    #pohyb do prava
+    if keys[pygame.K_RIGHT] and player_rect.colliderect(zone_right) or keys[pygame.K_d] and player_rect.colliderect(
+            zone_right):
+        scroll -= PLAYER_VEL * delta_time
+        scroll_cloud += PLAYER_VEL * delta_time
+        for obstacle in obstacles:
+            obstacle.move(-PLAYER_VEL * delta_time)
+    elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        player_rect.x += 2
+        if not facing_right:
+            facing_right = True
+            facing_left = False
+            player.skin = pygame.transform.flip(player.skin, True, False)
+
+
+def draw(character_skin):
     global cloud_scroll
     clock.tick(60)
 
-    screen.blit(blittable_chosen_character, (0, 0))
     screen.blit(mountain_image, (0, 0))
 
     # clouds
@@ -81,6 +166,8 @@ def draw(blittable_chosen_character):
         if abs(ground_scroll) > ground_width:
             scroll = 0
 
+    screen.blit(character_skin, (player_rect.x, player_rect.y))
+
     pygame.display.update()
 
 
@@ -90,12 +177,13 @@ def main(chosen_character):
     run = True
 
     if chosen_character == "red":
-        blittable_chosen_character = blittable_red_character
+        character_skin = blittable_red_character
     elif chosen_character == "blue":
-        blittable_chosen_character = blittable_blue_character
+        character_skin = blittable_blue_character
     else:
         print("choosing character failed in main_game.py, choosing red")
-        blittable_chosen_character = blittable_red_character
+        character_skin = blittable_red_character
+    player = Character(name="test", skin=character_skin, health=5, health_max=5)
 
     while run:
         for event in pygame.event.get():
@@ -103,7 +191,8 @@ def main(chosen_character):
                 run = False
                 continue_running_check = False
 
-        draw(blittable_chosen_character)
+        draw(character_skin)
+        movement(player)
 
 
 # TODO: postava
@@ -112,3 +201,4 @@ def main(chosen_character):
 #   možná použít upravený ground images a dát jim rect vlastnosti?
 # TODO: výhra
 win = True
+time_spent = 0
