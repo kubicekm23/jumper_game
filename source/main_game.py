@@ -12,15 +12,24 @@ if system_width > 2500:
     large_window = True
     WIDTH = 2520
     HEIGHT = 1200
+    MOVEMENT_MODIFIER = 2
+    EXTRA_SIZE_X = 1020
+    EXTRA_SIZE_Y = 700
 
 elif system_width > 1200:
     WIDTH = 1500
     HEIGHT = 500
+    MOVEMENT_MODIFIER = 1
+    EXTRA_SIZE_X = 0
+    EXTRA_SIZE_Y = 0
 
 else:
     print("resolution setting failed")
     WIDTH = 1200
     HEIGHT = 500
+    MOVEMENT_MODIFIER = 1
+    EXTRA_SIZE_X = 0
+    EXTRA_SIZE_Y = 0
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jumping game")
@@ -39,14 +48,16 @@ cloud_scroll = 0
 ground_scroll = 0
 general_scroll = 0
 
+PLAYER_VEL = 5
+
 # background images
 cloud_image = pygame.image.load("images/clouds.png").convert_alpha()
 ground_image = pygame.image.load("images/ground.png").convert()
 if not large_window:
-    mountain_image = pygame.image.load("images/mountain.png")
+    mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X, 500 + EXTRA_SIZE_Y))
     ground = pygame.transform.scale(ground_image, (50, 50))
 elif large_window:
-    mountain_image = pygame.image.load("images/mountain.png")
+    mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X, 500 + EXTRA_SIZE_Y))
     ground = pygame.transform.scale(ground_image, (100, 100))
     # TODO: add a large mountain.png
 
@@ -93,10 +104,10 @@ class Character:
         self.collected_star3 = False
 
 
-def movement():
-    global facing_left, facing_right, scroll, scroll_cloud, PLAYER_VEL
+def movement(player):
+    global facing_left, facing_right, general_scroll, cloud_scroll, PLAYER_VEL, ground_scroll
 
-    delta_time = clock.tick(FPS) / 25
+    delta_time = clock.tick(60) / 25
     keys = pygame.key.get_pressed()
     touching_ground = False
     touching_top = False
@@ -116,12 +127,13 @@ def movement():
     #pohyb do leva
     if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
         zone_left):
-        scroll += PLAYER_VEL * delta_time
-        scroll_cloud += PLAYER_VEL * delta_time
-        for obstacle in obstacles:
-            obstacle.move(PLAYER_VEL * delta_time)
+        general_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
+        cloud_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
+        ground_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
+        #for obstacle in obstacles:
+        #    obstacle.move(PLAYER_VEL * delta_time)
     elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        player_rect.x -= 2
+        player_rect.x -= 2 * MOVEMENT_MODIFIER
         #otáčení hráče
         if not facing_left:
             facing_right = False
@@ -131,12 +143,13 @@ def movement():
     #pohyb do prava
     if keys[pygame.K_RIGHT] and player_rect.colliderect(zone_right) or keys[pygame.K_d] and player_rect.colliderect(
             zone_right):
-        scroll -= PLAYER_VEL * delta_time
-        scroll_cloud += PLAYER_VEL * delta_time
-        for obstacle in obstacles:
-            obstacle.move(-PLAYER_VEL * delta_time)
+        general_scroll -= PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
+        cloud_scroll -= PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
+        ground_scroll -= PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
+        #for obstacle in obstacles:
+        #    obstacle.move(-PLAYER_VEL * delta_time)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        player_rect.x += 2
+        player_rect.x += 2 * MOVEMENT_MODIFIER
         if not facing_right:
             facing_right = True
             facing_left = False
@@ -144,19 +157,20 @@ def movement():
 
 
 def draw(character_skin):
-    global cloud_scroll
+    global cloud_scroll, general_scroll, ground_scroll
     clock.tick(60)
+    screen.fill((0, 0, 0))
 
     screen.blit(mountain_image, (0, 0))
 
     # clouds
-    for i in range(-1, tiles + 1):
+    for i in range(-2, tiles + 2):
         screen.blit(cloud_image, (i * mountain_image.get_width() + cloud_scroll, 0))
 
         # vyresetování scroll_cloud
         if abs(cloud_scroll) > mountain_image.get_width():
             cloud_scroll = 0
-    cloud_scroll += 0.1
+    cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
     # zem
     for i in range(-9, ground_tiles + 9):
@@ -164,7 +178,7 @@ def draw(character_skin):
         screen.blit(ground, (i * ground_width + ground_scroll - 50, HEIGHT - ground_height))
         # vyresetování scroll
         if abs(ground_scroll) > ground_width:
-            scroll = 0
+            ground_scroll = 0
 
     screen.blit(character_skin, (player_rect.x, player_rect.y))
 
