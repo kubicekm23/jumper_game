@@ -40,7 +40,7 @@ clock = pygame.time.Clock()
 red_character = pygame.image.load("images/red_character.png")
 blittable_red_character = pygame.transform.scale(red_character, (50, 50))
 
-blue_character = pygame.image.load("images/red_character.png")
+blue_character = pygame.image.load("images/blue_character.png")
 blittable_blue_character = pygame.transform.scale(blue_character, (50, 50))
 
 # hodnoty pohybu pozadí

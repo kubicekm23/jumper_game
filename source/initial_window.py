@@ -22,6 +22,9 @@ chosen_character = None
 def drawing_initial_window():
     SCREEN.fill(GRAYISH_WHITE)
 
+    background_image = pygame.image.load("images/potential_backgrond_full_effects.png")
+    SCREEN.blit(background_image, (0, 0))
+
     button_distance_from_border = 60
 
     red_character_button_rect = pygame.Rect(button_distance_from_border, INITIAL_WINDOW_HEIGHT - 170, 100, 100)
@@ -29,7 +32,7 @@ def drawing_initial_window():
 
     # načtení postav
     red_character = pygame.image.load("images/red_character.png")
-    blue_character = pygame.image.load("images/red_character.png")
+    blue_character = pygame.image.load("images/blue_character.png")
     # TODO: přidat skin pro druhou postavu
 
     blitted_red_character = pygame.transform.scale(red_character, (200, 200))
@@ -43,10 +46,6 @@ def drawing_initial_window():
     # zobrazení textu na okně
     SCREEN.blit(top_text, (INITIAL_WINDOW_WIDTH / 2 - top_text.get_width() / 2, 20))
     SCREEN.blit(top_text_2, (INITIAL_WINDOW_WIDTH / 2 - top_text_2.get_width() / 2, 55))
-
-    # zobrazení tlačítek na okně
-    pygame.draw.circle(SCREEN, RED, red_character_button_rect.center, 50)
-    pygame.draw.circle(SCREEN, BLUE, (INITIAL_WINDOW_WIDTH - button_distance_from_border - 50, red_character_button_rect.y + 50), 50)
 
     # zobrazení postav na okně
     SCREEN.blit(blitted_red_character, (red_character_button_rect.x - blitted_red_character.get_width() / 2 + 60,
