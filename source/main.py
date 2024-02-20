@@ -22,11 +22,15 @@ if __name__ == "__main__":
         import main_game
         main_game.main(chosen_character)
 
-        from main_game import win, time_spent
         returned_values = main_game.main(chosen_character)
         win_check = returned_values[0]
-        time_spent_playing = returned_values[1]
+        time_played = returned_values[1]
 
-        print(win_check, time_spent_playing)
+        seconds = (time_played / 1000) % 60
+        seconds = int(seconds)
+        minutes = (time_played / (1000 * 60)) % 60
+        minutes = int(minutes)
+
+        print(win_check, "%d:%d" % (minutes, seconds))
 
     #import scoreboard

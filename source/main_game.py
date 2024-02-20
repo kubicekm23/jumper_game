@@ -13,13 +13,15 @@ if system_width > 2500:
     WIDTH = 2520
     HEIGHT = 1200
     MOVEMENT_MODIFIER = 2
+    SIZE_MODIFIER = 1
     EXTRA_SIZE_X = 1020
     EXTRA_SIZE_Y = 700
 
 elif system_width > 1200:
     WIDTH = 1500
     HEIGHT = 500
-    MOVEMENT_MODIFIER = 1
+    MOVEMENT_MODIFIER = 1.5
+    SIZE_MODIFIER = 1
     EXTRA_SIZE_X = 0
     EXTRA_SIZE_Y = 0
 
@@ -27,7 +29,8 @@ else:
     print("resolution setting failed")
     WIDTH = 1200
     HEIGHT = 500
-    MOVEMENT_MODIFIER = 1
+    MOVEMENT_MODIFIER = 1.5
+    SIZE_MODIFIER = 1
     EXTRA_SIZE_X = 0
     EXTRA_SIZE_Y = 0
 
@@ -38,10 +41,10 @@ clock = pygame.time.Clock()
 
 # characters
 red_character = pygame.image.load("images/red_character.png")
-blittable_red_character = pygame.transform.scale(red_character, (50, 50))
+blittable_red_character = pygame.transform.scale(red_character, (50 * SIZE_MODIFIER, 50 * SIZE_MODIFIER))
 
 blue_character = pygame.image.load("images/blue_character.png")
-blittable_blue_character = pygame.transform.scale(blue_character, (50, 50))
+blittable_blue_character = pygame.transform.scale(blue_character, (50 * SIZE_MODIFIER, 50 * SIZE_MODIFIER))
 
 # hodnoty pohybu pozadí
 cloud_scroll = 0
@@ -196,6 +199,7 @@ def main(chosen_character):
     global continue_running_check
 
     run = True
+    time_playing = 0
 
     if chosen_character == "red":
         character_skin = blittable_red_character
@@ -207,20 +211,26 @@ def main(chosen_character):
     player = Character(name="test", skin=character_skin, health=5, health_max=5)
 
     while run:
+        time_playing += 1
+        draw(character_skin)
+        movement(player)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 continue_running_check = False
 
-        draw(character_skin)
-        movement(player)
+    time_right_now = pygame.time.get_ticks()
+    time_played = time_right_now - time_playing
+
+    win = True
+    return win, time_played
 
 
-# TODO: postava
 # TODO: pohyb
 #   odhadovaná vzdálenost skákání je 120px
 # TODO: překážky
-#   možná použít upravený ground images a dát jim rect vlastnosti?
 # TODO: výhra
-win = True
-time_spent = 0
+
+
+
+
