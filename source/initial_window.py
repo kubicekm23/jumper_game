@@ -33,7 +33,6 @@ def drawing_initial_window():
     # načtení postav
     red_character = pygame.image.load("images/red_character.png")
     blue_character = pygame.image.load("images/blue_character.png")
-    # TODO: přidat skin pro druhou postavu
 
     blitted_red_character = pygame.transform.scale(red_character, (200, 200))
     blitted_blue_character = pygame.transform.scale(blue_character, (200, 200))
@@ -100,7 +99,3 @@ def main():
     pygame.quit()
 
     return continue_running_check, chosen_character
-
-# TODO: zmáčknutelné tlačítko
-# TODO: vybírání postav
-# TODO: hezké pozadí

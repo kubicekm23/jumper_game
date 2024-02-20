@@ -49,17 +49,16 @@ ground_scroll = 0
 general_scroll = 0
 
 PLAYER_VEL = 5
+player_up_speed = 0
+GRAVITY = 1
 
 # background images
 cloud_image = pygame.image.load("images/clouds.png").convert_alpha()
 ground_image = pygame.image.load("images/ground.png").convert()
-if not large_window:
-    mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X, 500 + EXTRA_SIZE_Y))
-    ground = pygame.transform.scale(ground_image, (50, 50))
-elif large_window:
-    mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X, 500 + EXTRA_SIZE_Y))
-    ground = pygame.transform.scale(ground_image, (100, 100))
-    # TODO: add a large mountain.png
+mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X, 500 + EXTRA_SIZE_Y))
+ground = pygame.transform.scale(ground_image, (50 * MOVEMENT_MODIFIER, 50 * MOVEMENT_MODIFIER))
+# TODO: add a large mountain.png
+# TODO: add a png which will overlay the mountain.png for the obstacles, problably going to need to be transparent
 
 # nastavení proměnných pozadí
 tiles = math.ceil(WIDTH / mountain_image.get_height())
@@ -105,7 +104,7 @@ class Character:
 
 
 def movement(player):
-    global facing_left, facing_right, general_scroll, cloud_scroll, PLAYER_VEL, ground_scroll
+    global facing_left, facing_right, general_scroll, cloud_scroll, PLAYER_VEL, ground_scroll, player_up_speed
 
     delta_time = clock.tick(60) / 25
     keys = pygame.key.get_pressed()
@@ -117,12 +116,16 @@ def movement(player):
     #kontrola proti skákání ve vzduchu
     if player_rect.colliderect(ground_collisions):
         touching_ground = True
-    elif not player_rect.colliderect(ground_collisions):
+    else:
         touching_ground = False
 
     #kontrola zda je hráč na zemi, pokud jo tak ho posune na tu zem
-    if player_rect.y > HEIGHT - ground_height:
+    if player_rect.y + player_height > ground_collisions.y:
         player_rect.y = HEIGHT - ground_height - player_rect.height
+
+    if keys[pygame.K_UP] and touching_ground or keys[pygame.K_SPACE] and touching_ground or keys[pygame.K_w] and touching_ground:
+        player_up_speed = 12
+        touching_ground = False
 
     #pohyb do leva
     if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
@@ -155,6 +158,10 @@ def movement(player):
             facing_left = False
             player.skin = pygame.transform.flip(player.skin, True, False)
 
+    player_rect.y -= player_up_speed
+    if not touching_ground:
+        player_up_speed -= GRAVITY
+
 
 def draw(character_skin):
     global cloud_scroll, general_scroll, ground_scroll
@@ -165,7 +172,7 @@ def draw(character_skin):
 
     # clouds
     for i in range(-2, tiles + 2):
-        screen.blit(cloud_image, (i * mountain_image.get_width() + cloud_scroll, 0))
+        screen.blit(cloud_image, (i * mountain_image.get_width() + cloud_scroll, -1000))
 
         # vyresetování scroll_cloud
         if abs(cloud_scroll) > mountain_image.get_width():
@@ -211,6 +218,7 @@ def main(chosen_character):
 
 # TODO: postava
 # TODO: pohyb
+#   odhadovaná vzdálenost skákání je 120px
 # TODO: překážky
 #   možná použít upravený ground images a dát jim rect vlastnosti?
 # TODO: výhra
