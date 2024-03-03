@@ -128,44 +128,12 @@ def movement(player, obstacles):
     delta_time = clock.tick(60) / 25
     keys = pygame.key.get_pressed()
 
-    ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
 
-    players_last_pos = (player_rect.x, player_rect.y)
+    ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
 
     #kontrola proti skákání ve vzduchu
     if player_rect.colliderect(ground_collisions):
         touching_ground = True
-    else:
-        touching_ground = False
-
-    for obstacle in obstacles:
-        # povolit skákání z překážek
-        if player_rect.colliderect(obstacle):
-            touching_ground = True
-
-        if player_rect.colliderect(obstacle.rect):
-            # TODO: fix both sides of the obstacles
-            # If there is a collision with the left side of the obstacle
-            if player_rect.centery < obstacle.rect.bottomleft[1] and player_rect.centery > \
-                    obstacle.rect.topleft[1] and facing_right:
-                player_rect.x = obstacle.rect.left - player_width - 5
-
-            # If there is a collision with the right side of the obstacle
-            elif player_rect.centery - 2 < obstacle.rect.bottomright[1] and player_rect.centery - 2 > \
-                    obstacle.rect.topright[1] and facing_left:
-                player_rect.x = obstacle.rect.right + 5
-
-            # If there is a collision with the top of the obstacle
-            elif (player_rect.top < obstacle.rect.top and player_rect.right > obstacle.rect.left + 4 and player_rect.left < obstacle.rect.right - 4):
-                player_rect.y = obstacle.rect.y - player_rect.height
-                player_up_speed = 0  # Stop the player's vertical movement
-                touching_ground = True
-
-            # If there is a collision with the bottom of the obstacle, move the player down
-            elif player_rect.y < obstacle.rect.bottom and player_rect.y > obstacle.rect.top and \
-                    player_rect.x > obstacle.rect.left and player_rect.x < obstacle.rect.right:
-                player_rect.y = obstacle.rect.y + player_rect.height
-                player_up_speed = 0
 
     #kontrola zda je hráč na zemi, pokud jo tak ho posune na tu zem
     if player_rect.y + player_height > ground_collisions.y:
@@ -211,38 +179,45 @@ def movement(player, obstacles):
 
     for obstacle in obstacles:
         if player_rect.colliderect(obstacle.rect):
-            # If there is a collision with the bottom of the obstacle, move the player down
-            if player_rect.y < obstacle.rect.bottom and player_rect.y > obstacle.rect.top and \
-                    player_rect.x > obstacle.rect.left and player_rect.x < obstacle.rect.right:
-                player_rect.y = obstacle.rect.y + player_rect.height
+
+            # If there is a collision with the left side of the obstacle
+            if player_rect.right >= obstacle.rect.left + 3 and player_rect.left + 3 <= obstacle.rect.left:
+                if player_rect.bottom > obstacle.rect.top:
+                    player_rect.x = obstacle.rect.left - player_width
+                    player_speed_x = 0  # Stop the player's horizontal movement
+
+                else:
+                    player_rect.y = obstacle.rect.top - player_rect.height
+                    player_speed_x = 0  # Stop the player's vertical movement
+                    touching_ground = True
+
+            # TODO: fix both sides of the obstacles
 
             # If there is a collision with the right side of the obstacle
-            elif player_rect.right >= obstacle.rect.left and player_rect.left <= obstacle.rect.left:
+            elif player_rect.left <= obstacle.rect.right and player_rect.right >= obstacle.rect.right:
                 if player_rect.bottom > obstacle.rect.top:
                     player_rect.x = obstacle.rect.right + player_width
-                    VEL_PLAYER = 0  # Stop the player's horizontal movement
+                    player_speed_x = 0  # Stop the player's horizontal movement
 
                 else:
                     player_rect.y = obstacle.rect.top - player_rect.height
-                    VEL_PLAYER = 0  # Stop the player's vertical movement
-                    touching_ground = True
-            # TODO: fix both sides of the obstacles
-            # If there is a collision with the left side of the obstacle
-            elif player_rect.right >= obstacle.rect.left and player_rect.left >= obstacle.rect.left:
-                if player_rect.bottom > obstacle.rect.top + 15 and player_rect.top < obstacle.rect.bottom - 15:
-                    player_rect.x = obstacle.rect.left + player_rect.width
-                    VEL_PLAYER = 0  # Stop the player's horizontal movement
-                else:
-                    player_rect.y = obstacle.rect.top - player_rect.height
-                    VEL_PLAYER = 0  # Stop the player's vertical movement
+                    player_speed_x = 0  # Stop the player's vertical movement
                     touching_ground = True
 
             # If there is a collision with the top of the obstacle
-            elif player_rect.bottom > obstacle.rect.top and player_rect.top < obstacle.rect.top + 10:
-                player_rect.y = obstacle.rect.top - player_rect.height
-                VEL_PLAYER = 0  # Stop the player's vertical movement
+            elif (player_rect.bottom > obstacle.rect.top and player_rect.top < obstacle.rect.top and
+                  player_rect.right > obstacle.rect.left + 4 and player_rect.left < obstacle.rect.right - 4):
+                player_rect.y = obstacle.rect.y - player_rect.height
+                player_up_speed = 0  # Stop the player's vertical movement
                 touching_ground = True
 
+            # If there is a collision with the bottom of the obstacle, move the player down
+            elif player_rect.y < obstacle.rect.bottom and player_rect.y > obstacle.rect.top and \
+                 player_rect.x > obstacle.rect.left and player_rect.x < obstacle.rect.right:
+                player_rect.y = obstacle.rect.y + player_rect.height
+                player_up_speed = 0
+
+    player_rect.x += player_speed_x * MOVEMENT_MODIFIER
     player_rect.y -= player_up_speed
     if not touching_ground:
         player_up_speed -= GRAVITY
