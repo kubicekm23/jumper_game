@@ -16,6 +16,9 @@ if system_width > 2500:
     SIZE_MODIFIER = 2
     EXTRA_SIZE_X = 1020
     EXTRA_SIZE_Y = 700
+    BACKGROUND_INIT_X = 800
+    BACKGROUND_INIT_Y = -10855
+    LARGE_MAP = True
 
 elif system_width > 1200:
     WIDTH = 1500
@@ -24,6 +27,9 @@ elif system_width > 1200:
     SIZE_MODIFIER = 1
     EXTRA_SIZE_X = 0
     EXTRA_SIZE_Y = 0
+    BACKGROUND_INIT_X = 800
+    BACKGROUND_INIT_Y = -11525
+    LARGE_MAP = False
 
 else:
     print("resolution setting failed")
@@ -33,11 +39,21 @@ else:
     SIZE_MODIFIER = 1
     EXTRA_SIZE_X = 0
     EXTRA_SIZE_Y = 0
+    BACKGROUND_INIT_X = 800
+    BACKGROUND_INIT_Y = -9000
+    LARGE_MAP = False
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jumping game")
 
 clock = pygame.time.Clock()
+
+# barvičky
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 # characters
 red_character = pygame.image.load("images/red_character.png")
@@ -59,7 +75,8 @@ player_speed_x = 0
 # background images
 cloud_image = pygame.image.load("images/clouds.png").convert_alpha()
 ground_image = pygame.image.load("images/ground.png").convert()
-mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X, 500 + EXTRA_SIZE_Y))
+mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X,
+                                                                                   500 + EXTRA_SIZE_Y))
 ground = pygame.transform.scale(ground_image, (50 * MOVEMENT_MODIFIER, 50 * MOVEMENT_MODIFIER))
 main_background_image = pygame.image.load("images/prototype images/testing_background_distances.png").convert_alpha()
 # TODO: add a large mountain.png
@@ -73,8 +90,13 @@ ground_height = ground.get_height()
 
 # pozice hráče
 player_initial_position = (WIDTH / 2 - 27, HEIGHT - ground_height)
-player_height, player_width = 55 * SIZE_MODIFIER, 50 * SIZE_MODIFIER
-player_rect = pygame.Rect((player_initial_position[0], player_initial_position[1] - player_height, player_height, player_width))
+player_height = 55 * SIZE_MODIFIER
+player_width = 50 * SIZE_MODIFIER
+player_rect = pygame.Rect((
+    player_initial_position[0],
+    player_initial_position[1] - player_height,
+    player_height,
+    player_width))
 
 # pohybové rozmezí pro postavu
 zone_left = pygame.Rect((WIDTH / 2 - 80), 0, 5, HEIGHT)
@@ -84,7 +106,7 @@ zone_right = pygame.Rect((WIDTH / 2 + 80), 0, 5, HEIGHT)
 facing_left = False
 facing_right = False
 
-#skákací hodnoty
+# skákací hodnoty
 touching_ground = False
 touching_top = False
 
@@ -98,7 +120,7 @@ collected_star2 = False
 collected_star3 = False
 
 
-#hráč
+# hráč
 class Character:
     def __init__(self, name, skin, health, health_max):
         self.name = name
@@ -112,7 +134,7 @@ class Character:
         self.collected_star3 = False
 
 
-#platformy
+# platformy
 class Obstacle:
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
@@ -132,7 +154,7 @@ def movement(player, obstacles):
 
     players_last_pos = (player_rect.x, player_rect.y)
 
-    #kontrola proti skákání ve vzduchu
+    # kontrola proti skákání ve vzduchu
     if player_rect.colliderect(ground_collisions):
         touching_ground = True
     else:
@@ -167,7 +189,7 @@ def movement(player, obstacles):
                 player_rect.y = obstacle.rect.y + player_rect.height
                 player_up_speed = 0
 
-    #kontrola zda je hráč na zemi, pokud jo tak ho posune na tu zem
+    # kontrola zda je hráč na zemi, pokud jo tak ho posune na tu zem
     if player_rect.y + player_height > ground_collisions.y:
         player_rect.y = HEIGHT - ground_height - player_rect.height
 
@@ -175,7 +197,7 @@ def movement(player, obstacles):
         player_up_speed = 15
         touching_ground = False
 
-    #pohyb do leva
+    # pohyb do leva
     if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
         zone_left):
         general_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
@@ -186,13 +208,13 @@ def movement(player, obstacles):
     elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
         player_speed_x = -2
 
-        #otáčení hráče
+        # otáčení hráče
         if not facing_left:
             facing_right = False
             facing_left = True
             player.skin = pygame.transform.flip(player.skin, True, False)
 
-    #pohyb do prava
+    # pohyb do prava
     if keys[pygame.K_RIGHT] and player_rect.colliderect(zone_right) or keys[pygame.K_d] and player_rect.colliderect(
             zone_right):
         general_scroll -= PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
@@ -220,30 +242,31 @@ def movement(player, obstacles):
             elif player_rect.right >= obstacle.rect.left and player_rect.left <= obstacle.rect.left:
                 if player_rect.bottom > obstacle.rect.top:
                     player_rect.x = obstacle.rect.right + player_width
-                    VEL_PLAYER = 0  # Stop the player's horizontal movement
+                    player_speed_x = 0  # Stop the player's horizontal movement
 
                 else:
                     player_rect.y = obstacle.rect.top - player_rect.height
-                    VEL_PLAYER = 0  # Stop the player's vertical movement
+                    player_speed_x = 0  # Stop the player's vertical movement
                     touching_ground = True
             # TODO: fix both sides of the obstacles
             # If there is a collision with the left side of the obstacle
             elif player_rect.right >= obstacle.rect.left and player_rect.left >= obstacle.rect.left:
                 if player_rect.bottom > obstacle.rect.top + 15 and player_rect.top < obstacle.rect.bottom - 15:
                     player_rect.x = obstacle.rect.left + player_rect.width
-                    VEL_PLAYER = 0  # Stop the player's horizontal movement
+                    player_speed_x = 0  # Stop the player's horizontal movement
                 else:
                     player_rect.y = obstacle.rect.top - player_rect.height
-                    VEL_PLAYER = 0  # Stop the player's vertical movement
+                    player_speed_x = 0  # Stop the player's vertical movement
                     touching_ground = True
 
             # If there is a collision with the top of the obstacle
             elif player_rect.bottom > obstacle.rect.top and player_rect.top < obstacle.rect.top + 10:
                 player_rect.y = obstacle.rect.top - player_rect.height
-                VEL_PLAYER = 0  # Stop the player's vertical movement
+                player_speed_x = 0  # Stop the player's vertical movement
                 touching_ground = True
 
     player_rect.y -= player_up_speed
+    player_rect.x += player_speed_x
     if not touching_ground:
         player_up_speed -= GRAVITY
     player_speed_x = 0
@@ -268,13 +291,14 @@ def draw(character_skin, current_character_skin, obstacles):
             cloud_scroll = 0
     cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
-    # pozadí
-    screen.blit(main_background_image, (800 + general_scroll, -10855))
+    # pozadí (800 + general_scroll, -10855
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y))
 
     # zem
     for i in range(-9, ground_tiles + 9):
         screen.blit(ground, (i * ground_width + ground_scroll, HEIGHT - ground_height))
         screen.blit(ground, (i * ground_width + ground_scroll - 50, HEIGHT - ground_height))
+
         # vyresetování scroll
         if abs(ground_scroll) > ground_width:
             ground_scroll = 0
@@ -291,8 +315,12 @@ def main(chosen_character):
     global continue_running_check
 
     import map_storage
-    returned_obstacles = map_storage.first_map()
-    obstacles = returned_obstacles
+    if LARGE_MAP:
+        returned_obstacles = map_storage.first_map()
+        obstacles = returned_obstacles
+    else:
+        returned_obstacles = map_storage.second_map()
+        obstacles = returned_obstacles
 
     run = True
     time_playing = 0

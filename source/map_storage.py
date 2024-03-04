@@ -20,3 +20,18 @@ def first_map():
     obstacles = [obstacle1, obstacle2, obstacle3, obstacle4, obstacle5]
 
     return obstacles
+
+
+def second_map():
+    # maybe differences in Y of about 670??  + obstacles height??? SAVE MF
+    difference_smol = 670
+
+    obstacle1 = Obstacle(1475, 360, 211, 30)
+    obstacle2 = Obstacle(1750, 274, 138, 23)
+    obstacle3 = Obstacle(1901, 1009 - difference_smol, 138, 23)
+    obstacle4 = Obstacle(2123, 1004 - difference_smol, 138, 23)
+    obstacle5 = Obstacle(2318, 926 - difference_smol, 138, 23)
+
+    obstacles = [obstacle1, obstacle2, obstacle3, obstacle4, obstacle5]
+
+    return obstacles
