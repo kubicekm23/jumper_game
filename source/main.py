@@ -33,4 +33,6 @@ if __name__ == "__main__":
 
         print(win_check, "%d:%d" % (minutes, seconds))
 
-    #import scoreboard
+        if win_check:
+            from scoreboard import main
+            main(minutes, seconds)

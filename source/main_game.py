@@ -152,7 +152,7 @@ def movement(player, obstacles):
 
     ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
 
-    players_last_pos = (player_rect.x, player_rect.y)
+    #players_last_pos = (player_rect.x, player_rect.y)
 
     # kontrola proti skákání ve vzduchu
     if player_rect.colliderect(ground_collisions):
@@ -168,14 +168,16 @@ def movement(player, obstacles):
         if player_rect.colliderect(obstacle.rect):
             # TODO: fix both sides of the obstacles
             # If there is a collision with the left side of the obstacle
-            if player_rect.centery < obstacle.rect.bottomleft[1] and player_rect.centery > \
+            if player_rect.centery - 2 < obstacle.rect.bottomleft[1] and player_rect.centery - 2 > \
                     obstacle.rect.topleft[1] and facing_right:
-                player_rect.x = obstacle.rect.left - player_width - 5
+                #player_rect.x = obstacle.rect.left - player_width - 5
+                player_rect.x -= 5
 
             # If there is a collision with the right side of the obstacle
             elif player_rect.centery - 2 < obstacle.rect.bottomright[1] and player_rect.centery - 2 > \
                     obstacle.rect.topright[1] and facing_left:
-                player_rect.x = obstacle.rect.right + 5
+                #player_rect.x = obstacle.rect.right + 5
+                player_rect.x += 5
 
             # If there is a collision with the top of the obstacle
             elif (player_rect.top < obstacle.rect.top and player_rect.right > obstacle.rect.left + 4 and player_rect.left < obstacle.rect.right - 4):
@@ -206,7 +208,7 @@ def movement(player, obstacles):
         for obstacle in obstacles:
             obstacle.move(PLAYER_VEL * delta_time * MOVEMENT_MODIFIER)
     elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        player_speed_x = -2
+        player_speed_x = -PLAYER_VEL * MOVEMENT_MODIFIER * delta_time
 
         # otáčení hráče
         if not facing_left:
@@ -225,45 +227,11 @@ def movement(player, obstacles):
             obstacle.move(-PLAYER_VEL * delta_time * MOVEMENT_MODIFIER)
 
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        player_speed_x = 2
+        player_speed_x = PLAYER_VEL * MOVEMENT_MODIFIER * delta_time
         if not facing_right:
             facing_right = True
             facing_left = False
             player.skin = pygame.transform.flip(player.skin, True, False)
-
-    for obstacle in obstacles:
-        if player_rect.colliderect(obstacle.rect):
-            # If there is a collision with the bottom of the obstacle, move the player down
-            if player_rect.y < obstacle.rect.bottom and player_rect.y > obstacle.rect.top and \
-                    player_rect.x > obstacle.rect.left and player_rect.x < obstacle.rect.right:
-                player_rect.y = obstacle.rect.y + player_rect.height
-
-            # If there is a collision with the right side of the obstacle
-            elif player_rect.right >= obstacle.rect.left and player_rect.left <= obstacle.rect.left:
-                if player_rect.bottom > obstacle.rect.top:
-                    player_rect.x = obstacle.rect.right + player_width
-                    player_speed_x = 0  # Stop the player's horizontal movement
-
-                else:
-                    player_rect.y = obstacle.rect.top - player_rect.height
-                    player_speed_x = 0  # Stop the player's vertical movement
-                    touching_ground = True
-            # TODO: fix both sides of the obstacles
-            # If there is a collision with the left side of the obstacle
-            elif player_rect.right >= obstacle.rect.left and player_rect.left >= obstacle.rect.left:
-                if player_rect.bottom > obstacle.rect.top + 15 and player_rect.top < obstacle.rect.bottom - 15:
-                    player_rect.x = obstacle.rect.left + player_rect.width
-                    player_speed_x = 0  # Stop the player's horizontal movement
-                else:
-                    player_rect.y = obstacle.rect.top - player_rect.height
-                    player_speed_x = 0  # Stop the player's vertical movement
-                    touching_ground = True
-
-            # If there is a collision with the top of the obstacle
-            elif player_rect.bottom > obstacle.rect.top and player_rect.top < obstacle.rect.top + 10:
-                player_rect.y = obstacle.rect.top - player_rect.height
-                player_speed_x = 0  # Stop the player's vertical movement
-                touching_ground = True
 
     player_rect.y -= player_up_speed
     player_rect.x += player_speed_x
@@ -343,10 +311,12 @@ def main(chosen_character):
             if event.type == pygame.QUIT:
                 run = False
                 continue_running_check = False
+                #break
 
     time_right_now = pygame.time.get_ticks()
     time_played = time_right_now - time_playing
 
+    #pygame.quit()
     win = True
     return win, time_played
 

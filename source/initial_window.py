@@ -24,18 +24,24 @@ active = False
 text = ''
 name_chosen = False
 
+
 def input_box():
     global done, active, text, input_box_color
 
     for event in pygame.event.get():
+        print("Event type:", event.type)  # Debug print
         if event.type == pygame.QUIT:
             return True, None
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             if name_input_box.collidepoint(event.pos):
-                active = not active
+                active = True
+                print("test")
             else:
                 active = False
+            print("test2")
             input_box_color = ACTIVE_COLOR if active else INACTIVE_COLOR
+
         if event.type == pygame.KEYDOWN:
             if active:
                 if event.key == pygame.K_RETURN:
@@ -45,21 +51,30 @@ def input_box():
                     text = text[:-1]
                 else:
                     text += event.unicode
+            print("test 3")
+
+    if text == "":
+        text = "Vyberte si jméno"
+
     return False, None
 
+
 def drawing_initial_window():
+    global text
+
     SCREEN.fill(GRAYISH_WHITE)
-    SCREEN.blit(pygame.image.load("images/potential_backgrond_full_effects.png"), (0,0))
+    SCREEN.blit(pygame.image.load("images/potential_backgrond_full_effects.png"), (0, 0))
 
     # Drawing input box
     pygame.draw.rect(SCREEN, input_box_color, name_input_box, 2)
-    font = pygame.font.Font(None, 32)
+    font = pygame.font.SysFont('Calibri', 30)
     text_surface = font.render(text, True, BLACK)
-    SCREEN.blit(text_surface, (name_input_box.x, name_input_box.y + 5))
+    SCREEN.blit(text_surface, (name_input_box.centerx - text_surface.get_width() / 2, name_input_box.centery - text_surface.get_height() / 2))
 
     button_distance_from_border = 60
     red_character_button_rect = pygame.Rect(button_distance_from_border, INITIAL_WINDOW_HEIGHT - 170, 100, 100)
-    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - button_distance_from_border - 100, red_character_button_rect.y, 100, 100)
+    blue_character_button_rect = pygame.Rect(INITIAL_WINDOW_WIDTH - button_distance_from_border - 100,
+                                             red_character_button_rect.y, 100, 100)
 
     red_character = pygame.image.load("images/red_character.png")
     blue_character = pygame.image.load("images/blue_character.png")
@@ -82,6 +97,7 @@ def drawing_initial_window():
     pygame.display.update()
     return red_character_button_rect, blue_character_button_rect
 
+
 def on_mouse_button_down(event):
     global chosen_character
 
@@ -96,6 +112,7 @@ def on_mouse_button_down(event):
         elif blue_character_button_rect.collidepoint(event.pos):
             chosen_character = "blue"
 
+
 def main():
     global chosen_character
 
@@ -103,8 +120,8 @@ def main():
     continue_running_check = CONTINUE_RUNNING
 
     while initial_window_run:
-        result, character = input_box()
-        if result:
+        done, character = input_box()
+        if done:
             return False, None
 
         drawing_initial_window()
