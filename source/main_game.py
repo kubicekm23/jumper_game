@@ -79,6 +79,7 @@ mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png")
                                                                                    500 + EXTRA_SIZE_Y))
 ground = pygame.transform.scale(ground_image, (50 * MOVEMENT_MODIFIER, 50 * MOVEMENT_MODIFIER))
 main_background_image = pygame.image.load("images/prototype images/testing_background_distances.png").convert_alpha()
+main_background_image_y = 0
 # TODO: add a large mountain.png
 # TODO: add a png which will overlay the mountain.png for the obstacles, problably going to need to be transparent
 
@@ -142,17 +143,22 @@ class Obstacle:
     def move(self, general_scroll):
         self.rect.x += general_scroll
 
+    def movey(self, scroll_up):
+        self.rect.y += scroll_up
+
 
 def movement(player, obstacles):
     global facing_left, facing_right, general_scroll, cloud_scroll, PLAYER_VEL, ground_scroll, player_up_speed
-    global touching_ground, touching_top, player_speed_x
+    global touching_ground, touching_top, player_speed_x, main_background_image_y
 
     delta_time = clock.tick(60) / 25
     keys = pygame.key.get_pressed()
 
     ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
+    upper_barrier = pygame.Rect(0, 50, WIDTH, 1)
+    bottom_barrier = pygame.Rect(0, HEIGHT - ground_height + 5, WIDTH, 1)
 
-    #players_last_pos = (player_rect.x, player_rect.y)
+    main_background_image_y = 0
 
     # kontrola proti skákání ve vzduchu
     if player_rect.colliderect(ground_collisions):
@@ -170,17 +176,16 @@ def movement(player, obstacles):
             # If there is a collision with the left side of the obstacle
             if player_rect.centery - 2 < obstacle.rect.bottomleft[1] and player_rect.centery - 2 > \
                     obstacle.rect.topleft[1] and facing_right:
-                #player_rect.x = obstacle.rect.left - player_width - 5
                 player_rect.x -= 5
 
             # If there is a collision with the right side of the obstacle
             elif player_rect.centery - 2 < obstacle.rect.bottomright[1] and player_rect.centery - 2 > \
                     obstacle.rect.topright[1] and facing_left:
-                #player_rect.x = obstacle.rect.right + 5
                 player_rect.x += 5
 
             # If there is a collision with the top of the obstacle
-            elif (player_rect.top < obstacle.rect.top and player_rect.right > obstacle.rect.left + 4 and player_rect.left < obstacle.rect.right - 4):
+            elif (player_rect.top < obstacle.rect.top and player_rect.right > obstacle.rect.left + 4 and
+                  player_rect.left < obstacle.rect.right - 4):
                 player_rect.y = obstacle.rect.y - player_rect.height
                 player_up_speed = 0  # Stop the player's vertical movement
                 touching_ground = True
@@ -194,10 +199,6 @@ def movement(player, obstacles):
     # kontrola zda je hráč na zemi, pokud jo tak ho posune na tu zem
     if player_rect.y + player_height > ground_collisions.y:
         player_rect.y = HEIGHT - ground_height - player_rect.height
-
-    if keys[pygame.K_UP] and touching_ground or keys[pygame.K_SPACE] and touching_ground or keys[pygame.K_w] and touching_ground:
-        player_up_speed = 15
-        touching_ground = False
 
     # pohyb do leva
     if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
@@ -233,7 +234,24 @@ def movement(player, obstacles):
             facing_left = False
             player.skin = pygame.transform.flip(player.skin, True, False)
 
-    player_rect.y -= player_up_speed
+    # pohyby nahoru a dolů
+    if keys[pygame.K_UP] and touching_ground or keys[pygame.K_SPACE] and touching_ground or keys[
+        pygame.K_w] and touching_ground:
+        player_up_speed = 15
+        touching_ground = False
+
+    if player_rect.colliderect(upper_barrier):
+        for obstacle in obstacles:
+            obstacle.movey(player_up_speed)
+        main_background_image_y += player_up_speed
+
+    elif player_rect.colliderect(bottom_barrier):
+        for obstacle in obstacles:
+            obstacle.movey(-player_up_speed)
+
+    else:
+        player_rect.y -= player_up_speed
+
     player_rect.x += player_speed_x
     if not touching_ground:
         player_up_speed -= GRAVITY
@@ -241,7 +259,7 @@ def movement(player, obstacles):
 
 
 def draw(character_skin, current_character_skin, obstacles):
-    global cloud_scroll, general_scroll, ground_scroll
+    global cloud_scroll, general_scroll, ground_scroll, main_background_image_y
     clock.tick(60)
     screen.fill((0, 0, 0))
 
@@ -260,7 +278,7 @@ def draw(character_skin, current_character_skin, obstacles):
     cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
     # pozadí (800 + general_scroll, -10855
-    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y))
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y + main_background_image_y))
 
     # zem
     for i in range(-9, ground_tiles + 9):
@@ -311,15 +329,13 @@ def main(chosen_character):
             if event.type == pygame.QUIT:
                 run = False
                 continue_running_check = False
-                #break
 
     time_right_now = pygame.time.get_ticks()
     time_played = time_right_now - time_playing
 
-    #pygame.quit()
     win = True
     return win, time_played
 
-
+# TODO: pohyb obrazovky nahoru dolů
 # TODO: překážky
 # TODO: výhra

@@ -10,13 +10,9 @@ if __name__ == "__main__":
     continue_running_check = returned_values[0]
     # uložení vybrané postavy
     chosen_character = returned_values[1]
+    # uložení jména hráče
+    player_name = returned_values[2]
 
-#    if continue_running_check:
-#
-#        import main_game
-#        main_game.main(chosen_character)
-#        from main_game import win, time_spent
-#        returned_values = main()
 
     if continue_running_check:
         import main_game
@@ -35,4 +31,4 @@ if __name__ == "__main__":
 
         if win_check:
             from scoreboard import main
-            main(minutes, seconds)
+            main(minutes, seconds, player_name)

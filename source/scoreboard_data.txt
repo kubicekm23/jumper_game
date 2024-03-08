@@ -1,2 +1,12 @@
-example_name, time;
-example_name_2, time2;
+test, 0:17
+test, 0:17
+gdh, 0:30
+Zadejte své jméno:, 0:25
+adasd, 0:31
+plsfunguj, 0:26
+hggfsh, 0:25
+hgfdj, 0:37
+gfd, 0:19
+tdtftfd, 0:21
+užfunguj, 0:16
+tst, 0:24

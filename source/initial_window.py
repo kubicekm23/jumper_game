@@ -21,46 +21,45 @@ chosen_character = None
 name_input_box = pygame.Rect(INITIAL_WINDOW_WIDTH / 2 - 125, 100, 250, 70)
 input_box_color = INACTIVE_COLOR
 active = False
-text = ''
+input_text = ''
 name_chosen = False
 
 
 def input_box():
-    global done, active, text, input_box_color
+    global done, active, input_text, input_box_color
 
     for event in pygame.event.get():
-        print("Event type:", event.type)  # Debug print
         if event.type == pygame.QUIT:
             return True, None
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if name_input_box.collidepoint(event.pos):
-                active = True
-                print("test")
-            else:
-                active = False
-            print("test2")
-            input_box_color = ACTIVE_COLOR if active else INACTIVE_COLOR
-
         if event.type == pygame.KEYDOWN:
-            if active:
-                if event.key == pygame.K_RETURN:
-                    print(text)
-                    text = ''
-                elif event.key == pygame.K_BACKSPACE:
-                    text = text[:-1]
-                else:
-                    text += event.unicode
-            print("test 3")
+            if input_text == "Zadejte své jméno:":
+                input_text = ""
 
-    if text == "":
-        text = "Vyberte si jméno"
+            if event.key == pygame.K_RETURN:  # Ukončení psaní po stisku Enteru
+                print("Uživatel napsal:", input_text)
 
-    return False, None
+                return True, input_text
+
+            elif event.key == pygame.K_BACKSPACE:  # Smazání posledního znaku
+                input_text = input_text[:-1]
+            else:
+                input_text += event.unicode  # Přidání stisknuté klávesy do psaného textu
+
+    font = pygame.font.SysFont('Calibri', 30)
+    input_text_test = font.render(input_text, True, BLACK)
+
+    SCREEN.blit(input_text_test, (0, 0))
+
+    if input_text == "":
+        input_text = "Zadejte své jméno:"
+
+    return False, input_text
+
 
 
 def drawing_initial_window():
-    global text
+    global input_text
 
     SCREEN.fill(GRAYISH_WHITE)
     SCREEN.blit(pygame.image.load("images/potential_backgrond_full_effects.png"), (0, 0))
@@ -68,7 +67,7 @@ def drawing_initial_window():
     # Drawing input box
     pygame.draw.rect(SCREEN, input_box_color, name_input_box, 2)
     font = pygame.font.SysFont('Calibri', 30)
-    text_surface = font.render(text, True, BLACK)
+    text_surface = font.render(input_text, True, BLACK)
     SCREEN.blit(text_surface, (name_input_box.centerx - text_surface.get_width() / 2, name_input_box.centery - text_surface.get_height() / 2))
 
     button_distance_from_border = 60
@@ -120,17 +119,17 @@ def main():
     continue_running_check = CONTINUE_RUNNING
 
     while initial_window_run:
-        done, character = input_box()
+        drawing_initial_window()
+
+        done, player_name = input_box()
         if done:
             return False, None
-
-        drawing_initial_window()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 initial_window_run = False
                 continue_running_check = False
-            on_mouse_button_down(event)  # Move this line inside the event loop
+            on_mouse_button_down(event)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
@@ -141,7 +140,8 @@ def main():
             initial_window_run = False
 
     pygame.quit()
-    return continue_running_check, chosen_character
+
+    return continue_running_check, chosen_character, player_name
 
 if __name__ == "__main__":
     main()
