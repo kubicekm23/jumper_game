@@ -1,5 +1,3 @@
-# TODO: scoreboard display
-
 import pygame
 import sys
 
@@ -30,8 +28,8 @@ def draw(time_spent, score_list):
     difference = 0
     distance = 20
 
-    score_text = font.render("Your time spent Playing: " + str(time_spent), True, BLACK)
-    screen.blit(score_text, (SCREEN_WIDTH / 2 - score_text.get_width() / 2, 20))
+    score_text = font.render("Váš čas: " + str(time_spent), True, BLACK)
+    screen.blit(score_text, (SCREEN_WIDTH / 2 - score_text.get_width() / 2, 25))
 
     # tabulka s minulými skóre
     for score in score_list:

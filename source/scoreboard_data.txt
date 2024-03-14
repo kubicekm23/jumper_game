@@ -1,5 +1,3 @@
-test, 0:17
-test, 0:17
 gdh, 0:30
 Zadejte své jméno:, 0:25
 adasd, 0:31

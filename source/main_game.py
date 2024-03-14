@@ -19,6 +19,7 @@ if system_width > 2500:
     BACKGROUND_INIT_X = 800
     BACKGROUND_INIT_Y = -10855
     LARGE_MAP = True
+    star1 = pygame.Rect(2318, 926 - 40, 40, 40)
 
 elif system_width > 1200:
     WIDTH = 1500
@@ -30,6 +31,7 @@ elif system_width > 1200:
     BACKGROUND_INIT_X = 800
     BACKGROUND_INIT_Y = -11525
     LARGE_MAP = False
+    star1 = pygame.Rect(2318, 926 - 670 - 40, 40, 40)
 
 else:
     print("resolution setting failed")
@@ -42,6 +44,7 @@ else:
     BACKGROUND_INIT_X = 800
     BACKGROUND_INIT_Y = -9000
     LARGE_MAP = False
+    star1 = pygame.Rect(2318, 926 - 670 - 50, 50, 50)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jumping game")
@@ -81,7 +84,6 @@ ground = pygame.transform.scale(ground_image, (50 * MOVEMENT_MODIFIER, 50 * MOVE
 main_background_image = pygame.image.load("images/prototype images/testing_background_distances.png").convert_alpha()
 main_background_image_y = 0
 # TODO: add a large mountain.png
-# TODO: add a png which will overlay the mountain.png for the obstacles, problably going to need to be transparent
 
 # nastavení proměnných pozadí
 tiles = math.ceil(WIDTH / mountain_image.get_height())
@@ -130,9 +132,6 @@ class Character:
         self.health_max = health_max
         self.rect = pygame.Rect(WIDTH / 2, HEIGHT - ground_height - player_height, 50, 50)
         self.velocity = 0
-        self.collected_star1 = False
-        self.collected_star2 = False
-        self.collected_star3 = False
 
 
 # platformy
@@ -148,14 +147,15 @@ class Obstacle:
 
 
 def movement(player, obstacles):
-    global facing_left, facing_right, general_scroll, cloud_scroll, PLAYER_VEL, ground_scroll, player_up_speed
-    global touching_ground, touching_top, player_speed_x, main_background_image_y
+    global facing_left, facing_right, general_scroll, cloud_scroll, PLAYER_VEL, ground_scroll, player_up_speed, \
+        touching_ground, touching_top, player_speed_x, main_background_image_y, collected_star1, collected_star2, \
+        collected_star3
 
     delta_time = clock.tick(60) / 25
     keys = pygame.key.get_pressed()
 
     ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
-    upper_barrier = pygame.Rect(0, 50, WIDTH, 1)
+    upper_barrier = pygame.Rect(0, 80 * MOVEMENT_MODIFIER, WIDTH, 1)
     bottom_barrier = pygame.Rect(0, HEIGHT - ground_height + 5, WIDTH, 1)
 
     main_background_image_y = 0
@@ -240,17 +240,29 @@ def movement(player, obstacles):
         player_up_speed = 15
         touching_ground = False
 
-    if player_rect.colliderect(upper_barrier):
+    if player_rect.y < upper_barrier.bottom:
         for obstacle in obstacles:
             obstacle.movey(player_up_speed)
         main_background_image_y += player_up_speed
 
-    elif player_rect.colliderect(bottom_barrier):
+    elif player_rect.y > bottom_barrier.top:
         for obstacle in obstacles:
             obstacle.movey(-player_up_speed)
 
     else:
         player_rect.y -= player_up_speed
+
+    if player_rect.y < 5:
+        player_rect.y = 10
+
+    if player_rect.colliderect(star1):
+        collected_star1 = True
+
+    #if player_rect.colliderect(star2):
+    #    collected_star2 = True
+
+    #if player_rect.colliderect(star2):
+    #    collected_star2 = True
 
     player_rect.x += player_speed_x
     if not touching_ground:
@@ -278,7 +290,7 @@ def draw(character_skin, current_character_skin, obstacles):
     cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
     # pozadí (800 + general_scroll, -10855
-    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y + main_background_image_y))
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y - main_background_image_y))
 
     # zem
     for i in range(-9, ground_tiles + 9):
@@ -288,6 +300,22 @@ def draw(character_skin, current_character_skin, obstacles):
         # vyresetování scroll
         if abs(ground_scroll) > ground_width:
             ground_scroll = 0
+
+    if LARGE_MAP:
+        if not collected_star1:
+            screen.blit(collectible_star1, (star1.x + general_scroll, star1.y - collectible_star1.get_height()))
+        if not collected_star2:
+            pass
+        if not collected_star3:
+            pass
+    elif not LARGE_MAP:
+        if not collected_star1:
+            screen.blit(collectible_star1, (star1.x + general_scroll, star1.y))
+        if not collected_star2:
+            pass
+        if not collected_star3:
+            pass
+    print(collected_star1)
 
     screen.blit(current_character_skin, (player_rect.x, player_rect.y))
 
