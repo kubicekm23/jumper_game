@@ -19,7 +19,8 @@ if system_width > 2500:
     BACKGROUND_INIT_X = 800
     BACKGROUND_INIT_Y = -10855
     LARGE_MAP = True
-    star1 = pygame.Rect(2318, 926 - 40, 40, 40)
+    star1_x = 2318
+    star1 = pygame.Rect(star1_x, 926 - 40, 40, 40)
 
 elif system_width > 1200:
     WIDTH = 1500
@@ -31,7 +32,8 @@ elif system_width > 1200:
     BACKGROUND_INIT_X = 800
     BACKGROUND_INIT_Y = -11525
     LARGE_MAP = False
-    star1 = pygame.Rect(2318, 926 - 670 - 40, 40, 40)
+    star1_x = 2318
+    star1 = pygame.Rect(star1_x, 926 - 670 - 40, 40, 40)
 
 else:
     print("resolution setting failed")
@@ -44,7 +46,8 @@ else:
     BACKGROUND_INIT_X = 800
     BACKGROUND_INIT_Y = -9000
     LARGE_MAP = False
-    star1 = pygame.Rect(2318, 926 - 670 - 50, 50, 50)
+    star1_x = 2318
+    star1 = pygame.Rect(star1_x, 926 - 670 - 50, 50, 50)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jumping game")
@@ -255,6 +258,8 @@ def movement(player, obstacles):
     if player_rect.y < 5:
         player_rect.y = 10
 
+    star1.x = star1_x + general_scroll
+
     if player_rect.colliderect(star1):
         collected_star1 = True
 
@@ -303,14 +308,14 @@ def draw(character_skin, current_character_skin, obstacles):
 
     if LARGE_MAP:
         if not collected_star1:
-            screen.blit(collectible_star1, (star1.x + general_scroll, star1.y - collectible_star1.get_height()))
+            screen.blit(collectible_star1, (star1.x, star1.y))
         if not collected_star2:
             pass
         if not collected_star3:
             pass
     elif not LARGE_MAP:
         if not collected_star1:
-            screen.blit(collectible_star1, (star1.x + general_scroll, star1.y))
+            screen.blit(collectible_star1, (star1.x, star1.y))
         if not collected_star2:
             pass
         if not collected_star3:
