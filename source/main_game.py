@@ -320,7 +320,6 @@ def draw(character_skin, current_character_skin, obstacles):
             pass
         if not collected_star3:
             pass
-    print(collected_star1)
 
     screen.blit(current_character_skin, (player_rect.x, player_rect.y))
 

@@ -26,10 +26,18 @@ def first_map():
     obstacle10 = Obstacle(1920, 384, 348, 50)
     obstacle11 = Obstacle(2111, 236, 138, 23)
     obstacle12 = Obstacle(1900, 97, 138, 23)
-
+    obstacle13 = Obstacle(1672, -92, 211, 30)
+    obstacle14 = Obstacle(1487, -220, 138, 23)
+    obstacle15 = Obstacle(1677, -376, 138, 23)
+    obstacle16 = Obstacle(1479, -531, 138, 23)
+    obstacle17 = Obstacle(1677, -691, 138, 23)
+    obstacle18 = Obstacle(1487, -868, 138, 23)
+    obstacle19 = Obstacle(1670, -1025, 138, 23)
+    obstacle20 = Obstacle(1832, -1181, 138, 23)
 
     obstacles = [obstacle1, obstacle2, obstacle3, obstacle4, obstacle5, obstacle6, obstacle7, obstacle8, obstacle9,
-                 obstacle10, obstacle11, obstacle12]
+                 obstacle10, obstacle11, obstacle12, obstacle13, obstacle14, obstacle15, obstacle16, obstacle17,
+                 obstacle18, obstacle19, obstacle20]
 
     return obstacles
 
