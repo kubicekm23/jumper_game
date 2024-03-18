@@ -159,7 +159,7 @@ def movement(player, obstacles):
 
     ground_collisions = pygame.Rect(0, (HEIGHT - ground_height), WIDTH, ground_height)
     upper_barrier = pygame.Rect(0, 80 * MOVEMENT_MODIFIER, WIDTH, 1)
-    bottom_barrier = pygame.Rect(0, HEIGHT - ground_height + 5, WIDTH, 1)
+    bottom_barrier = pygame.Rect(0, HEIGHT - ground_height, WIDTH, 1)
 
     main_background_image_y = 0
 
@@ -205,7 +205,7 @@ def movement(player, obstacles):
 
     # pohyb do leva
     if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
-        zone_left):
+            zone_left):
         general_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
         cloud_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
         ground_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
@@ -239,18 +239,21 @@ def movement(player, obstacles):
 
     # pohyby nahoru a dolů
     if keys[pygame.K_UP] and touching_ground or keys[pygame.K_SPACE] and touching_ground or keys[
-        pygame.K_w] and touching_ground:
-        player_up_speed = 15
+            pygame.K_w] and touching_ground:
+        player_up_speed = 15 * 1.3
         touching_ground = False
 
-    if player_rect.y < upper_barrier.bottom:
+    #save
+    if player_rect.y < upper_barrier.bottom and player_up_speed > 0:
         for obstacle in obstacles:
             obstacle.movey(player_up_speed)
         main_background_image_y += player_up_speed
 
-    elif player_rect.y > bottom_barrier.top:
+    if (player_rect.y > bottom_barrier.top and player_up_speed < 0 and ground_collisions.y > HEIGHT
+            - ground_collisions.height / 2):
         for obstacle in obstacles:
             obstacle.movey(-player_up_speed)
+        main_background_image_y += player_up_speed
 
     else:
         player_rect.y -= player_up_speed
@@ -259,20 +262,24 @@ def movement(player, obstacles):
         player_rect.y = 10
 
     star1.x = star1_x + general_scroll
-
+    star1.y = obstacles[2].rect.y - star1.height * 4 - 5
     if player_rect.colliderect(star1):
         collected_star1 = True
 
-    #if player_rect.colliderect(star2):
+    # if player_rect.colliderect(star2):
     #    collected_star2 = True
 
-    #if player_rect.colliderect(star2):
+    # if player_rect.colliderect(star2):
     #    collected_star2 = True
 
     player_rect.x += player_speed_x
     if not touching_ground:
         player_up_speed -= GRAVITY
+    # TODO: opravit pohyb mapy dolů, ground_collisions se nepohybuje dolů a asi ani nahoru, jelikož se nehýbe vůbec
+    if not player_rect.colliderect(ground_collisions):
+        ground_collisions.y += player_up_speed
     player_speed_x = 0
+    print(ground_collisions.y)
 
 
 def draw(character_skin, current_character_skin, obstacles):
@@ -287,7 +294,7 @@ def draw(character_skin, current_character_skin, obstacles):
 
     # clouds
     for i in range(-2, tiles + 2):
-        screen.blit(cloud_image, (i * mountain_image.get_width() + cloud_scroll, -1000))
+        screen.blit(cloud_image, (i * mountain_image.get_width() + cloud_scroll, -1000 + player_up_speed))
 
         # vyresetování scroll_cloud
         if abs(cloud_scroll) > mountain_image.get_width():
@@ -295,7 +302,8 @@ def draw(character_skin, current_character_skin, obstacles):
     cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
     # pozadí (800 + general_scroll, -10855
-    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y - main_background_image_y))
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y -
+                                        main_background_image_y))
 
     # zem
     for i in range(-9, ground_tiles + 9):
