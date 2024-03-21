@@ -16,5 +16,6 @@ Návod k instalaci a spuštění:
 
 TBA:
 - [ ] Boss fight
-- [ ] funkční pohyb obrazovky nahoru a dolů
+- [ ] pohyb pozadí nahoru a dolů
 - [ ] obrázek pro pozadí
+- [ ] vyřešit proč se hra nezavře když má, ale až na druhý pokus

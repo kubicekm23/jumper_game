@@ -11,3 +11,4 @@ tst, 0:24
 wda, 1:05
 w, 0:30
 Karel, 18:24
+Zadejte své jméno:, 0:19

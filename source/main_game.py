@@ -21,6 +21,8 @@ if system_width > 2500:
     LARGE_MAP = True
     star1_x = 2318
     star1 = pygame.Rect(star1_x, 926 - 40, 40, 40)
+    star2_x = 1487
+    star2 = pygame.Rect(star2_x, -868, 40, 40)
 
 elif system_width > 1200:
     WIDTH = 1500
@@ -34,6 +36,8 @@ elif system_width > 1200:
     LARGE_MAP = False
     star1_x = 2318
     star1 = pygame.Rect(star1_x, 926 - 670 - 40, 40, 40)
+    star2_x = 1487
+    star2 = pygame.Rect(star2_x, -868 - 670, 40, 40)
 
 else:
     print("resolution setting failed")
@@ -48,6 +52,8 @@ else:
     LARGE_MAP = False
     star1_x = 2318
     star1 = pygame.Rect(star1_x, 926 - 670 - 50, 50, 50)
+    star2_x = 1487
+    star2 = pygame.Rect(star2_x, -868 - 670, 40, 40)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jumping game")
@@ -263,11 +269,13 @@ def movement(player, obstacles):
 
     star1.x = star1_x + general_scroll
     star1.y = obstacles[2].rect.y - star1.height * 4 - 5
+    star2.x = star2_x + general_scroll + 20
+    star2.y = obstacles[17].rect.y - star2.height - 5
     if player_rect.colliderect(star1):
         collected_star1 = True
 
-    # if player_rect.colliderect(star2):
-    #    collected_star2 = True
+    if player_rect.colliderect(star2):
+        collected_star2 = True
 
     # if player_rect.colliderect(star2):
     #    collected_star2 = True
@@ -279,7 +287,7 @@ def movement(player, obstacles):
     if not player_rect.colliderect(ground_collisions):
         ground_collisions.y += player_up_speed
     player_speed_x = 0
-    print(ground_collisions.y)
+    #print(ground_collisions.y)
 
 
 def draw(character_skin, current_character_skin, obstacles):
@@ -314,25 +322,41 @@ def draw(character_skin, current_character_skin, obstacles):
         if abs(ground_scroll) > ground_width:
             ground_scroll = 0
 
-    if LARGE_MAP:
-        if not collected_star1:
-            screen.blit(collectible_star1, (star1.x, star1.y))
-        if not collected_star2:
-            pass
-        if not collected_star3:
-            pass
-    elif not LARGE_MAP:
-        if not collected_star1:
-            screen.blit(collectible_star1, (star1.x, star1.y))
-        if not collected_star2:
-            pass
-        if not collected_star3:
-            pass
+    if not collected_star1:
+        screen.blit(collectible_star1, (star1.x, star1.y))
+    if not collected_star2:
+        screen.blit(collectible_star1, (star2.x, star2.y))
+    if not collected_star3:
+        pass
 
     screen.blit(current_character_skin, (player_rect.x, player_rect.y))
 
     for obstacle in obstacles:
         pygame.draw.rect(screen, (255, 255, 255), obstacle.rect)
+
+    pygame.display.update()
+
+
+def level_finish_sequence(character_skin):
+    screen.fill(BLACK)
+
+    if facing_left:
+        current_character_skin = pygame.transform.flip(character_skin, True, False)
+    if facing_right:
+        current_character_skin = character_skin
+
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y -
+                                        main_background_image_y))
+
+    screen.blit(current_character_skin, (player_rect.x, player_rect.y))
+
+    done_counting = False
+    count = 0
+
+    while not done_counting:
+        count += 1
+        if count >= 7000:
+            done_counting = True
 
     pygame.display.update()
 
@@ -362,11 +386,16 @@ def main(chosen_character):
     player = Character(name="test", skin=character_skin, health=5, health_max=5)
     current_character_skin = character_skin
 
+    door_unlock_rect = pygame.Rect(obstacles[24].rect.centerx - 25, obstacles[24].rect.y - 339, 50, 339)
+
     while run:
         time_playing += 1
 
         draw(character_skin, current_character_skin, obstacles)
         movement(player, obstacles)
+
+        door_unlock_rect.x = obstacles[25].rect.centerx - 25
+        door_unlock_rect.y = obstacles[25].rect.y - 339
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -374,12 +403,18 @@ def main(chosen_character):
                 continue_running_check = False
 
         if collected_star1 and collected_star2:
-            win = True
-            continue_running_check = True
-            run = False
+            if player_rect.colliderect(door_unlock_rect):
+                level_finish_sequence(character_skin)
+
+                win = True
+                continue_running_check = True
+                run = False
+                break
 
     time_right_now = pygame.time.get_ticks()
     time_played = time_right_now - time_playing
+
+    pygame.quit()
 
     return win, time_played
 
