@@ -8,4 +8,6 @@ gfd, 0:19
 tdtftfd, 0:21
 užfunguj, 0:16
 tst, 0:24
-test, 1:26
+wda, 1:05
+w, 0:30
+Karel, 18:24

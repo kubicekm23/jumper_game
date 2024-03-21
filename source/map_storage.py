@@ -60,8 +60,17 @@ def second_map():
     obstacle10 = Obstacle(1920, 384 - difference_smol, 348, 50)
     obstacle11 = Obstacle(2111, 236 - difference_smol, 138, 23)
     obstacle12 = Obstacle(1900, 97 - difference_smol, 138, 23)
+    obstacle13 = Obstacle(1672, -92 - difference_smol, 211, 30)
+    obstacle14 = Obstacle(1487, -220 - difference_smol, 138, 23)
+    obstacle15 = Obstacle(1677, -376 - difference_smol, 138, 23)
+    obstacle16 = Obstacle(1479, -531 - difference_smol, 138, 23)
+    obstacle17 = Obstacle(1677, -691 - difference_smol, 138, 23)
+    obstacle18 = Obstacle(1487, -868 - difference_smol, 138, 23)
+    obstacle19 = Obstacle(1670, -1025 - difference_smol, 138, 23)
+    obstacle20 = Obstacle(1832, -1181 - difference_smol, 138, 23)
 
     obstacles = [obstacle1, obstacle2, obstacle3, obstacle4, obstacle5, obstacle6, obstacle7, obstacle8, obstacle9,
-                 obstacle10, obstacle11, obstacle12]
+                 obstacle10, obstacle11, obstacle12, obstacle13, obstacle14, obstacle15, obstacle16, obstacle17,
+                 obstacle18, obstacle19, obstacle20]
 
     return obstacles
