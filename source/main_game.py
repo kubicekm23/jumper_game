@@ -205,7 +205,7 @@ def movement(player, obstacles):
 
     # pohyb do leva
     if keys[pygame.K_LEFT] and player_rect.colliderect(zone_left) or keys[pygame.K_a] and player_rect.colliderect(
-        zone_left):
+            zone_left):
         general_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
         cloud_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
         ground_scroll += PLAYER_VEL * delta_time * MOVEMENT_MODIFIER
@@ -239,7 +239,7 @@ def movement(player, obstacles):
 
     # pohyby nahoru a dolů
     if keys[pygame.K_UP] and touching_ground or keys[pygame.K_SPACE] and touching_ground or keys[
-        pygame.K_w] and touching_ground:
+            pygame.K_w] and touching_ground:
         player_up_speed = 15
         touching_ground = False
 
@@ -295,7 +295,8 @@ def draw(character_skin, current_character_skin, obstacles):
     cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
     # pozadí (800 + general_scroll, -10855
-    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y - main_background_image_y))
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y -
+                                        main_background_image_y))
 
     # zem
     for i in range(-9, ground_tiles + 9):
@@ -340,6 +341,7 @@ def main(chosen_character):
         returned_obstacles = map_storage.second_map()
         obstacles = returned_obstacles
 
+    win = None
     run = True
     time_playing = 0
 
@@ -355,17 +357,23 @@ def main(chosen_character):
 
     while run:
         time_playing += 1
+
         draw(character_skin, current_character_skin, obstacles)
         movement(player, obstacles)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 continue_running_check = False
 
+        if collected_star1 and collected_star2:
+            win = True
+            continue_running_check = True
+            run = False
+
     time_right_now = pygame.time.get_ticks()
     time_played = time_right_now - time_playing
 
-    win = True
     return win, time_played
 
 # TODO: pohyb obrazovky nahoru dolů

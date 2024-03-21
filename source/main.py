@@ -31,4 +31,4 @@ if __name__ == "__main__":
 
         if win_check:
             from scoreboard import main
-            main(minutes, seconds, player_name)
+            main(minutes, seconds, player_name, win_check)

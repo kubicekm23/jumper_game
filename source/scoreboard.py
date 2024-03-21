@@ -49,13 +49,15 @@ def draw(time_spent, score_list):
     pygame.display.flip()
 
 
-def main(minutes, seconds, player_name):
+def main(minutes, seconds, player_name, win_check):
     run = True
     time_spent = "%d:%02d" % (minutes, seconds)
+    win = win_check
 
-    soubor = open('scoreboard_data.txt', 'a', encoding='utf-8')
-    soubor.write(player_name + ", " + time_spent + '\n')
-    soubor.close()
+    if win:
+        soubor = open('scoreboard_data.txt', 'a', encoding='utf-8')
+        soubor.write(player_name + ", " + time_spent + '\n')
+        soubor.close()
 
     soubor = open("scoreboard_data.txt", 'r', encoding='utf-8')
     score_list = []
