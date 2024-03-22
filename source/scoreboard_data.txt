@@ -11,4 +11,8 @@ tst, 0:24
 wda, 1:05
 w, 0:30
 Karel, 18:24
-Zadejte své jméno:, 0:19
+willyework?, 0:34
+speedrun, 0:37
+asd, 0:52
+wer, 0:41
+tttttt, 0:39

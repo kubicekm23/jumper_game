@@ -48,7 +48,7 @@ else:
     EXTRA_SIZE_X = 0
     EXTRA_SIZE_Y = 0
     BACKGROUND_INIT_X = 800
-    BACKGROUND_INIT_Y = -9000
+    BACKGROUND_INIT_Y = -11525
     LARGE_MAP = False
     star1_x = 2318
     star1 = pygame.Rect(star1_x, 926 - 670 - 50, 50, 50)
@@ -249,7 +249,7 @@ def movement(player, obstacles):
         player_up_speed = 15 * 1.3
         touching_ground = False
 
-    #save
+    # save
     if player_rect.y < upper_barrier.bottom and player_up_speed > 0:
         for obstacle in obstacles:
             obstacle.movey(player_up_speed)
@@ -287,7 +287,6 @@ def movement(player, obstacles):
     if not player_rect.colliderect(ground_collisions):
         ground_collisions.y += player_up_speed
     player_speed_x = 0
-    #print(ground_collisions.y)
 
 
 def draw(character_skin, current_character_skin, obstacles):
@@ -310,8 +309,7 @@ def draw(character_skin, current_character_skin, obstacles):
     cloud_scroll += 0.2 * MOVEMENT_MODIFIER
 
     # pozadí (800 + general_scroll, -10855
-    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y -
-                                        main_background_image_y))
+    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, main_background_image_y))
 
     # zem
     for i in range(-9, ground_tiles + 9):
@@ -338,6 +336,10 @@ def draw(character_skin, current_character_skin, obstacles):
 
 
 def level_finish_sequence(character_skin):
+    main_background_image_opendoors = pygame.image.load(
+        "images/prototype images/testing_background_distances.png"
+    ).convert_alpha()
+
     screen.fill(BLACK)
 
     if facing_left:
@@ -345,24 +347,24 @@ def level_finish_sequence(character_skin):
     if facing_right:
         current_character_skin = character_skin
 
-    screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, BACKGROUND_INIT_Y -
-                                        main_background_image_y))
+    screen.blit(main_background_image_opendoors, (BACKGROUND_INIT_X + general_scroll, main_background_image_y))
 
     screen.blit(current_character_skin, (player_rect.x, player_rect.y))
 
+    # pozastavení před vypnutím
     done_counting = False
     count = 0
 
     while not done_counting:
         count += 1
-        if count >= 7000:
+        if count >= 20000:
             done_counting = True
 
     pygame.display.update()
 
 
 def main(chosen_character):
-    global continue_running_check
+    global continue_running_check, main_background_image_y
 
     import map_storage
     if LARGE_MAP:
@@ -394,8 +396,13 @@ def main(chosen_character):
         draw(character_skin, current_character_skin, obstacles)
         movement(player, obstacles)
 
+        # kolize k otevření dveří
         door_unlock_rect.x = obstacles[25].rect.centerx - 25
         door_unlock_rect.y = obstacles[25].rect.y - 339
+
+        # nastavení pozadí.y aby bylo relativně k překážkám
+        main_background_image_y = obstacles[0].rect.y - 10495 - 1385
+        # TODO: překážky nesedí k pozadí, potřeba lehce upravit
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -411,13 +418,12 @@ def main(chosen_character):
                 run = False
                 break
 
+    continue_running_check = True
     time_right_now = pygame.time.get_ticks()
     time_played = time_right_now - time_playing
 
-    pygame.quit()
-
-    return win, time_played
+    return win, time_played, continue_running_check
 
 # TODO: pohyb obrazovky nahoru dolů
-# TODO: překážky
+# TODO: překážky se nepohybují stejně
 # TODO: výhra

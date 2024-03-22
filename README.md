@@ -13,9 +13,8 @@ Návod k instalaci a spuštění:
     
     4) 4)pokuste si užít hru
 
-
 TBA:
 - [ ] Boss fight
 - [ ] pohyb pozadí nahoru a dolů
 - [ ] obrázek pro pozadí
-- [ ] vyřešit proč se hra nezavře když má, ale až na druhý pokus
+- [x] vyřešit proč se hra nezavře když má, ale až na druhý pokus
