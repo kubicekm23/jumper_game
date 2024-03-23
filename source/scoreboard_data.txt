@@ -1,18 +1,11 @@
-gdh, 0:30
-Zadejte své jméno:, 0:25
-adasd, 0:31
 plsfunguj, 0:26
-hggfsh, 0:25
-hgfdj, 0:37
-gfd, 0:19
-tdtftfd, 0:21
 užfunguj, 0:16
-tst, 0:24
-wda, 1:05
-w, 0:30
 Karel, 18:24
 willyework?, 0:34
 speedrun, 0:37
-asd, 0:52
-wer, 0:41
-tttttt, 0:39
+missing-name, 0:24
+missing-name, 0:24
+missing-name, 0:24
+missing-name, 0:25
+Karel, 0:30
+missing-name, 0:23

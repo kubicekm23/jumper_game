@@ -10,10 +10,10 @@ if __name__ == "__main__":
     # uložení jména hráče
     player_name = returned_values[2]
 
-
     if continue_running_check:
-        import main_game
-        returned_values = main_game.main(chosen_character)
+        import first_level
+        returned_values = first_level.main(chosen_character)
+
         win_check = returned_values[0]
         time_played = returned_values[1]
         continue_running_check = returned_values[2]

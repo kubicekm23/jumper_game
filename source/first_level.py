@@ -92,7 +92,8 @@ mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png")
 ground = pygame.transform.scale(ground_image, (50 * MOVEMENT_MODIFIER, 50 * MOVEMENT_MODIFIER))
 main_background_image = pygame.image.load("images/prototype images/testing_background_distances.png").convert_alpha()
 main_background_image_y = 0
-# TODO: add a large mountain.png
+main_background_image_opendoors = pygame.image.load("images/prototype images/door_opened.png").convert_alpha()
+
 
 # nastavení proměnných pozadí
 tiles = math.ceil(WIDTH / mountain_image.get_height())
@@ -277,9 +278,6 @@ def movement(player, obstacles):
     if player_rect.colliderect(star2):
         collected_star2 = True
 
-    # if player_rect.colliderect(star2):
-    #    collected_star2 = True
-
     player_rect.x += player_speed_x
     if not touching_ground:
         player_up_speed -= GRAVITY
@@ -329,38 +327,24 @@ def draw(character_skin, current_character_skin, obstacles):
 
     screen.blit(current_character_skin, (player_rect.x, player_rect.y))
 
-    for obstacle in obstacles:
-        pygame.draw.rect(screen, (255, 255, 255), obstacle.rect)
-
     pygame.display.update()
 
 
 def level_finish_sequence(character_skin):
-    main_background_image_opendoors = pygame.image.load(
-        "images/prototype images/testing_background_distances.png"
-    ).convert_alpha()
+    screen.fill((0, 0, 0))
 
-    screen.fill(BLACK)
+    screen.blit(main_background_image_opendoors, (BACKGROUND_INIT_X + general_scroll, main_background_image_y))
 
     if facing_left:
         current_character_skin = pygame.transform.flip(character_skin, True, False)
     if facing_right:
         current_character_skin = character_skin
 
-    screen.blit(main_background_image_opendoors, (BACKGROUND_INIT_X + general_scroll, main_background_image_y))
-
     screen.blit(current_character_skin, (player_rect.x, player_rect.y))
+    pygame.display.flip()
 
     # pozastavení před vypnutím
-    done_counting = False
-    count = 0
-
-    while not done_counting:
-        count += 1
-        if count >= 20000:
-            done_counting = True
-
-    pygame.display.update()
+    pygame.time.wait(3000)
 
 
 def main(chosen_character):
@@ -393,6 +377,15 @@ def main(chosen_character):
     while run:
         time_playing += 1
 
+        if collected_star1 and collected_star2:
+            if player_rect.colliderect(door_unlock_rect):
+                level_finish_sequence(character_skin)
+
+                win = True
+                continue_running_check = True
+                run = False
+                break
+
         draw(character_skin, current_character_skin, obstacles)
         movement(player, obstacles)
 
@@ -408,15 +401,6 @@ def main(chosen_character):
             if event.type == pygame.QUIT:
                 run = False
                 continue_running_check = False
-
-        if collected_star1 and collected_star2:
-            if player_rect.colliderect(door_unlock_rect):
-                level_finish_sequence(character_skin)
-
-                win = True
-                continue_running_check = True
-                run = False
-                break
 
     continue_running_check = True
     time_right_now = pygame.time.get_ticks()

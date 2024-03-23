@@ -55,6 +55,9 @@ def main(minutes, seconds, player_name, win_check):
     win = win_check
 
     if win:
+        if player_name == "Zadejte své jméno:":
+            player_name = "missing-name"
+
         soubor = open('scoreboard_data.txt', 'a', encoding='utf-8')
         soubor.write(player_name + ", " + time_spent + '\n')
         soubor.close()
