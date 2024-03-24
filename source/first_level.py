@@ -90,9 +90,9 @@ ground_image = pygame.image.load("images/ground.png").convert()
 mountain_image = pygame.transform.scale(pygame.image.load("images/mountain.png"), (1200 + EXTRA_SIZE_X,
                                                                                    500 + EXTRA_SIZE_Y))
 ground = pygame.transform.scale(ground_image, (50 * MOVEMENT_MODIFIER, 50 * MOVEMENT_MODIFIER))
-main_background_image = pygame.image.load("images/prototype images/testing_background_distances.png").convert_alpha()
+main_background_image = pygame.image.load("images/background.png").convert_alpha()
 main_background_image_y = 0
-main_background_image_opendoors = pygame.image.load("images/prototype images/door_opened.png").convert_alpha()
+main_background_image_opendoors = pygame.image.load("images/door_opened.png").convert_alpha()
 
 
 # nastavení proměnných pozadí
@@ -290,7 +290,8 @@ def movement(player, obstacles):
 def draw(character_skin, current_character_skin, obstacles):
     global cloud_scroll, general_scroll, ground_scroll, main_background_image_y
     clock.tick(60)
-    screen.fill((0, 0, 0))
+    screen.fill((0, 168, 255))
+    pygame.draw.rect(screen, (10, 68, 5), (0, obstacles[0].rect.y + 80, WIDTH, 100))
 
     if facing_left:
         current_character_skin = pygame.transform.flip(character_skin, True, False)
@@ -309,14 +310,9 @@ def draw(character_skin, current_character_skin, obstacles):
     # pozadí (800 + general_scroll, -10855
     screen.blit(main_background_image, (BACKGROUND_INIT_X + general_scroll, main_background_image_y))
 
-    # zem
-    for i in range(-9, ground_tiles + 9):
-        screen.blit(ground, (i * ground_width + ground_scroll, HEIGHT - ground_height))
-        screen.blit(ground, (i * ground_width + ground_scroll - 50, HEIGHT - ground_height))
-
-        # vyresetování scroll
-        if abs(ground_scroll) > ground_width:
-            ground_scroll = 0
+    # vyresetování scroll
+    if abs(ground_scroll) > ground_width:
+        ground_scroll = 0
 
     if not collected_star1:
         screen.blit(collectible_star1, (star1.x, star1.y))
@@ -331,7 +327,7 @@ def draw(character_skin, current_character_skin, obstacles):
 
 
 def level_finish_sequence(character_skin):
-    screen.fill((0, 0, 0))
+    screen.fill((0, 168, 255))
 
     screen.blit(main_background_image_opendoors, (BACKGROUND_INIT_X + general_scroll, main_background_image_y))
 
